@@ -10,7 +10,6 @@ provide enum rec Data {
   TaggedList(Data, List<Data>),
 }
 
-// TODO: Track the brackets so that we throw an error if they don't close enough
 let rec parseOne = (in: List<String>, out: List<Data>) =>
   match ((in, out)) {
     (["(", ...restIn], [lastOut, ...restOut]) => {
@@ -23,10 +22,10 @@ let rec parseOne = (in: List<String>, out: List<Data>) =>
         Err(reason) => Err(reason),
       }
     },
-    ([")", ...restIn], out) => parseOne(restIn, out),
+    ([")", ...restIn], out) => Ok((restIn, List.reverse(out))),
     ([nextIn, ...restIn], out) =>
       parseOne(restIn, List.append([Symbol(nextIn)], out)),
-    ([], out) => Ok(([], out)),
+    ([], out) => Ok(([], List.reverse(out))),
   }: Result<(List<String>, List<Data>), String>
 
 provide let parse = tokens => match (parseOne(tokens, [])) {
@@ -38,8 +37,79 @@ provide let parse = tokens => match (parseOne(tokens, [])) {
 
 let tokeniseAndParse = example => parse(Tokenise.tokenise(example))
 
+let expectedCompare = Ok(
+  [
+    TaggedList(
+      Symbol("eq?"),
+      [
+        Symbol("second"),
+        TaggedList(
+          Symbol("first"),
+          [
+            TaggedList(
+              Symbol("rest"),
+              [
+                TaggedList(
+                  Symbol("pair"),
+                  [
+                    TaggedList(Symbol("Quote"), [Symbol("first")]),
+                    TaggedList(
+                      Symbol("pair"),
+                      [
+                        TaggedList(Symbol("Quote"), [Symbol("second")]),
+                        Symbol("end"),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+)
+
+let expectedAssignment = Ok(
+  [
+    TaggedList(
+      Symbol("Name"),
+      [
+        Symbol("data"),
+        TaggedList(
+          Symbol("pair"),
+          [
+            TaggedList(Symbol("Quote"), [Symbol("one")]),
+            TaggedList(
+              Symbol("pair"),
+              [TaggedList(Symbol("Quote"), [Symbol("two")]), Symbol("end")],
+            ),
+          ],
+        ),
+      ],
+    ),
+    TaggedList(
+      Symbol("Name"),
+      [Symbol("expected"), TaggedList(Symbol("Quote"), [Symbol("two")])],
+    ),
+    TaggedList(
+      Symbol("Name"),
+      [
+        Symbol("actual"),
+        TaggedList(
+          Symbol("first"),
+          [TaggedList(Symbol("rest"), [Symbol("data")])],
+        ),
+      ],
+    ),
+    TaggedList(Symbol("eq?"), [Symbol("expected"), Symbol("actual")]),
+  ],
+)
+
 provide let test = () =>
   Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol) &&
+    Ok([Symbol("foo"), Symbol("bar")]) == tokeniseAndParse(Examples.twoSymbols) &&
     Ok([TaggedList(Symbol("Quote"), [Symbol("foo")])]) ==
       tokeniseAndParse(Examples.quote) &&
     Ok(
@@ -50,4 +120,6 @@ provide let test = () =>
         ),
       ],
     ) ==
-      tokeniseAndParse(Examples.nestedQuote)
+      tokeniseAndParse(Examples.nestedQuote) &&
+    expectedCompare == tokeniseAndParse(Examples.compare) &&
+    expectedAssignment == tokeniseAndParse(Examples.assignment)

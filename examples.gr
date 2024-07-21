@@ -1,6 +1,7 @@
 module Examples
 
 provide let symbol = "foo"
+provide let twoSymbols = "foo bar"
 provide let quote = "Quote(foo)"
 provide let nestedQuote = "Quote(Quote(foo))"
 provide let compare =
@@ -8,8 +9,8 @@ provide let compare =
 provide let assignment =
   "
 Name(data pair(Quote(one)
-          pair(Quote(two)
-          end)))
+            pair(Quote(two)
+              end)))
 
 Name(expected Quote(two))
 Name(actual first(rest(data)))
