@@ -41,4 +41,13 @@ let tokeniseAndParse = example => parse(Tokenise.tokenise(example))
 provide let test = () =>
   Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol) &&
     Ok([TaggedList(Symbol("Quote"), [Symbol("foo")])]) ==
-      tokeniseAndParse(Examples.quote)
+      tokeniseAndParse(Examples.quote) &&
+    Ok(
+      [
+        TaggedList(
+          Symbol("Quote"),
+          [TaggedList(Symbol("Quote"), [Symbol("foo")])],
+        ),
+      ],
+    ) ==
+      tokeniseAndParse(Examples.nestedQuote)
