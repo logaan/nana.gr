@@ -4,6 +4,11 @@
 * Discouraged things should have long names (eg. `evaluate` rather than `eval`)
 * Macros are capitalised
 * Clear names are better than traditional names (eg. `first` over `car`)
+* No commas between params
+
+# Other choices
+
+* No nulls, instead people should use specific values that are descriptive of the individual case.
 
 # Functions
 
