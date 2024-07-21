@@ -6,7 +6,7 @@
         {
             "label": "Compile and run",
             "type": "shell",
-            "command": "grain tokenise.gr",
+            "command": "grain test.gr",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

@@ -1,0 +1,9 @@
+module Test
+
+from "./tokenise.gr" include Tokenise
+from "./parser.gr" include Parser
+
+if (Tokenise.test() && Parser.test())
+  print("Tests passed")
+else
+  print("Tests failed")

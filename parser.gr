@@ -1,0 +1,40 @@
+module Parser
+
+from "./examples.gr" include Examples
+from "./tokenise.gr" include Tokenise
+from "result" include Result
+from "list" include List
+
+provide enum rec Data {
+  Symbol(String),
+  TaggedList(Data, List<Data>),
+}
+
+// TODO: Track the brackets so that we throw an error if they don't close enough
+let rec parseOne = (in: List<String>, out: List<Data>) =>
+  match ((in, out)) {
+    (["(", ...restIn], [lastOut, ...restOut]) => {
+      match (parseOne(restIn, [])) {
+        Ok((unparsed, nextIn)) =>
+          parseOne(
+            unparsed,
+            List.append([TaggedList(lastOut, nextIn)], restOut)
+          ),
+        Err(reason) => Err(reason),
+      }
+    },
+    ([nextIn, ...restIn], out) =>
+      parseOne(restIn, List.append([Symbol(nextIn)], out)),
+    ([")", ...restIn], out) => parseOne(restIn, out),
+    ([], out) => Ok(([], out)),
+  }: Result<(List<String>, List<Data>), String>
+
+provide let parse = tokens => match (parseOne(tokens, [])) {
+  Ok(([], data)) => Ok(data),
+  Ok(([_, ..._], _)) => Err("Didn't consume all input tokens"),
+  Ok(_) => Err("Unexpected error"),
+  Err(reason) => Err(reason),
+}
+
+provide let test = () =>
+  Ok([Symbol("foo")]) == parse(Tokenise.tokenise(Examples.symbol))
