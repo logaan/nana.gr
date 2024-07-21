@@ -23,9 +23,9 @@ let rec parseOne = (in: List<String>, out: List<Data>) =>
         Err(reason) => Err(reason),
       }
     },
+    ([")", ...restIn], out) => parseOne(restIn, out),
     ([nextIn, ...restIn], out) =>
       parseOne(restIn, List.append([Symbol(nextIn)], out)),
-    ([")", ...restIn], out) => parseOne(restIn, out),
     ([], out) => Ok(([], out)),
   }: Result<(List<String>, List<Data>), String>
 
@@ -36,5 +36,9 @@ provide let parse = tokens => match (parseOne(tokens, [])) {
   Err(reason) => Err(reason),
 }
 
+let tokeniseAndParse = example => parse(Tokenise.tokenise(example))
+
 provide let test = () =>
-  Ok([Symbol("foo")]) == parse(Tokenise.tokenise(Examples.symbol))
+  Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol) &&
+    Ok([TaggedList(Symbol("Quote"), [Symbol("foo")])]) ==
+      tokeniseAndParse(Examples.quote)
