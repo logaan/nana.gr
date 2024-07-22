@@ -3,97 +3,16 @@ module Tokenise
 from "regex" include Regex
 from "result" include Result
 from "list" include List
-from "./examples.gr" include Examples
+
+let re = pattern => {
+  Result.unwrap(Regex.make(pattern))
+}
 
 provide let tokenise = (input: String) => {
-  let opening_paren = Result.unwrap(Regex.make("\("))
-  let closing_paren = Result.unwrap(Regex.make("\)"))
-  let whitespace = Result.unwrap(Regex.make("[ \n\t]"))
-
-  let opening_puffed = Regex.replaceAll(opening_paren, input, " ( ")
-  let closing_puffed = Regex.replaceAll(closing_paren, opening_puffed, " ) ")
-  let split_with_empties = Regex.splitAll(whitespace, closing_puffed)
+  let opening_puffed = Regex.replaceAll(re("\("), input, " ( ")
+  let closing_puffed = Regex.replaceAll(re("\)"), opening_puffed, " ) ")
+  let split_with_empties = Regex.splitAll(re("[ \n\t]"), closing_puffed)
   let empties_dropped = List.filter(s => s != "", split_with_empties)
 
   empties_dropped
 }
-
-provide let test = () =>
-  tokenise(Examples.symbol) == ["foo"] &&
-    tokenise(Examples.quote) == ["Quote", "(", "foo", ")"] &&
-    tokenise(Examples.nestedQuote) ==
-      ["Quote", "(", "Quote", "(", "foo", ")", ")"] &&
-    tokenise(Examples.compare) ==
-      [
-        "eq?",
-        "(",
-        "second",
-        "first",
-        "(",
-        "rest",
-        "(",
-        "pair",
-        "(",
-        "Quote",
-        "(",
-        "first",
-        ")",
-        "pair",
-        "(",
-        "Quote",
-        "(",
-        "second",
-        ")",
-        "end",
-        ")",
-        ")",
-        ")",
-        ")",
-        ")",
-      ] &&
-    tokenise(Examples.assignment) ==
-      [
-        "Name",
-        "(",
-        "data",
-        "pair",
-        "(",
-        "Quote",
-        "(",
-        "one",
-        ")",
-        "pair",
-        "(",
-        "Quote",
-        "(",
-        "two",
-        ")",
-        "end",
-        ")",
-        ")",
-        ")",
-        "Name",
-        "(",
-        "expected",
-        "Quote",
-        "(",
-        "two",
-        ")",
-        ")",
-        "Name",
-        "(",
-        "actual",
-        "first",
-        "(",
-        "rest",
-        "(",
-        "data",
-        ")",
-        ")",
-        ")",
-        "eq?",
-        "(",
-        "expected",
-        "actual",
-        ")",
-      ]

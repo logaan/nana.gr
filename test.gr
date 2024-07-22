@@ -1,9 +1,180 @@
 module Test
 
+from "./examples.gr" include Examples
 from "./tokenise.gr" include Tokenise
 from "./parser.gr" include Parser
+use Parser.{ type Data }
 
-if (Tokenise.test() && Parser.test())
+let tokeniseAndParse = example => Parser.parse(Tokenise.tokenise(example))
+
+let expectedCompare = Ok(
+  [
+    TaggedList(
+      Symbol("eq?"),
+      [
+        Symbol("second"),
+        TaggedList(
+          Symbol("first"),
+          [
+            TaggedList(
+              Symbol("rest"),
+              [
+                TaggedList(
+                  Symbol("pair"),
+                  [
+                    TaggedList(Symbol("Quote"), [Symbol("first")]),
+                    TaggedList(
+                      Symbol("pair"),
+                      [
+                        TaggedList(Symbol("Quote"), [Symbol("second")]),
+                        Symbol("end"),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+)
+
+let expectedAssignment = Ok(
+  [
+    TaggedList(
+      Symbol("Name"),
+      [
+        Symbol("data"),
+        TaggedList(
+          Symbol("pair"),
+          [
+            TaggedList(Symbol("Quote"), [Symbol("one")]),
+            TaggedList(
+              Symbol("pair"),
+              [TaggedList(Symbol("Quote"), [Symbol("two")]), Symbol("end")],
+            ),
+          ],
+        ),
+      ],
+    ),
+    TaggedList(
+      Symbol("Name"),
+      [Symbol("expected"), TaggedList(Symbol("Quote"), [Symbol("two")])],
+    ),
+    TaggedList(
+      Symbol("Name"),
+      [
+        Symbol("actual"),
+        TaggedList(
+          Symbol("first"),
+          [TaggedList(Symbol("rest"), [Symbol("data")])],
+        ),
+      ],
+    ),
+    TaggedList(Symbol("eq?"), [Symbol("expected"), Symbol("actual")]),
+  ],
+)
+
+provide let testParser = () =>
+  Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol) &&
+    Ok([Symbol("foo"), Symbol("bar")]) == tokeniseAndParse(Examples.twoSymbols) &&
+    Ok([TaggedList(Symbol("Quote"), [Symbol("foo")])]) ==
+      tokeniseAndParse(Examples.quote) &&
+    Ok(
+      [
+        TaggedList(
+          Symbol("Quote"),
+          [TaggedList(Symbol("Quote"), [Symbol("foo")])],
+        ),
+      ],
+    ) ==
+      tokeniseAndParse(Examples.nestedQuote) &&
+    expectedCompare == tokeniseAndParse(Examples.compare) &&
+    expectedAssignment == tokeniseAndParse(Examples.assignment)
+
+provide let testTokeniser = () =>
+  Tokenise.tokenise(Examples.symbol) == ["foo"] &&
+    Tokenise.tokenise(Examples.quote) == ["Quote", "(", "foo", ")"] &&
+    Tokenise.tokenise(Examples.nestedQuote) ==
+      ["Quote", "(", "Quote", "(", "foo", ")", ")"] &&
+    Tokenise.tokenise(Examples.compare) ==
+      [
+        "eq?",
+        "(",
+        "second",
+        "first",
+        "(",
+        "rest",
+        "(",
+        "pair",
+        "(",
+        "Quote",
+        "(",
+        "first",
+        ")",
+        "pair",
+        "(",
+        "Quote",
+        "(",
+        "second",
+        ")",
+        "end",
+        ")",
+        ")",
+        ")",
+        ")",
+        ")",
+      ] &&
+    Tokenise.tokenise(Examples.assignment) ==
+      [
+        "Name",
+        "(",
+        "data",
+        "pair",
+        "(",
+        "Quote",
+        "(",
+        "one",
+        ")",
+        "pair",
+        "(",
+        "Quote",
+        "(",
+        "two",
+        ")",
+        "end",
+        ")",
+        ")",
+        ")",
+        "Name",
+        "(",
+        "expected",
+        "Quote",
+        "(",
+        "two",
+        ")",
+        ")",
+        "Name",
+        "(",
+        "actual",
+        "first",
+        "(",
+        "rest",
+        "(",
+        "data",
+        ")",
+        ")",
+        ")",
+        "eq?",
+        "(",
+        "expected",
+        "actual",
+        ")",
+      ]
+
+if (testTokeniser() && testParser())
   print("Tests passed")
 else
   print("Tests failed")
