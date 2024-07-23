@@ -11,10 +11,8 @@ provide enum rec Data {
 let rec parsePart = (in: List<String>, out: List<Data>) =>
   match ((in, out)) {
     (["(", ...restIn], out) => {
-      match (parsePart(restIn, [])) {
-        (unparsed, parsed) =>
-          parsePart(unparsed, Stdlist.append(out, [List(parsed)])),
-      }
+      let (unparsed, parsed) = parsePart(restIn, [])
+      parsePart(unparsed, Stdlist.append(out, [List(parsed)]))
     },
     ([")", ...restIn], out) => (restIn, out),
     ([nextIn, ...restIn], out) =>
