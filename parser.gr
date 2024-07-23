@@ -12,20 +12,18 @@ let rec parsePart = (in: List<String>, out: List<Data>) =>
   match ((in, out)) {
     (["(", ...restIn], out) => {
       match (parsePart(restIn, [])) {
-        Ok((unparsed, parsed)) =>
+        (unparsed, parsed) =>
           parsePart(unparsed, Stdlist.append(out, [List(parsed)])),
-        Err(reason) => Err(reason),
       }
     },
-    ([")", ...restIn], out) => Ok((restIn, out)),
+    ([")", ...restIn], out) => (restIn, out),
     ([nextIn, ...restIn], out) =>
       parsePart(restIn, Stdlist.append(out, [Symbol(nextIn)])),
-    ([], out) => Ok(([], out)),
-  }: Result<(List<String>, List<Data>), String>
+    ([], out) => ([], out),
+  }: (List<String>, List<Data>)
 
 provide let parse = tokens => match (parsePart(tokens, [])) {
-  Ok(([], data)) => Ok(data),
-  Ok(([_, ..._], _)) => Err("Didn't consume all input tokens"),
-  Ok(_) => Err("Unexpected error"),
-  Err(reason) => Err(reason),
+  ([], data) => Ok(data),
+  ([_, ..._], _) => Err("Didn't consume all input tokens"),
+  _ => Err("Unexpected error"),
 }
