@@ -1,29 +1,26 @@
 module Parser
 
 from "result" include Result
-from "list" include List
+from "list" include List as Stdlist
 
 provide enum rec Data {
   Symbol(String),
-  TaggedList(Data, List<Data>),
+  List(List<Data>),
 }
 
 let rec parsePart = (in: List<String>, out: List<Data>) =>
   match ((in, out)) {
-    (["(", ...restIn], [lastOut, ...restOut]) => {
+    (["(", ...restIn], out) => {
       match (parsePart(restIn, [])) {
-        Ok((unparsed, nextIn)) =>
-          parsePart(
-            unparsed,
-            List.append([TaggedList(lastOut, nextIn)], restOut)
-          ),
+        Ok((unparsed, parsed)) =>
+          parsePart(unparsed, Stdlist.append([List(parsed)], out)),
         Err(reason) => Err(reason),
       }
     },
-    ([")", ...restIn], out) => Ok((restIn, List.reverse(out))),
+    ([")", ...restIn], out) => Ok((restIn, Stdlist.reverse(out))),
     ([nextIn, ...restIn], out) =>
-      parsePart(restIn, List.append([Symbol(nextIn)], out)),
-    ([], out) => Ok(([], List.reverse(out))),
+      parsePart(restIn, Stdlist.append([Symbol(nextIn)], out)),
+    ([], out) => Ok(([], Stdlist.reverse(out))),
   }: Result<(List<String>, List<Data>), String>
 
 provide let parse = tokens => match (parsePart(tokens, [])) {

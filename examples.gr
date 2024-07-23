@@ -2,18 +2,18 @@ module Examples
 
 provide let symbol = "foo"
 provide let twoSymbols = "foo bar"
-provide let quote = "Quote(foo)"
-provide let nestedQuote = "Quote(Quote(foo))"
+provide let quote = "(Quote foo)"
+provide let nestedQuote = "(Quote (Quote foo))"
 provide let compare =
-  "eq?(second first(rest(pair(Quote(first) pair(Quote(second) end)))))"
+  "(eq? second (first (rest (pair (Quote first) (pair (Quote second) end)))))"
 provide let assignment =
   "
-Name(data pair(Quote(one)
-            pair(Quote(two)
+(Name data (pair (Quote one)
+            (pair (Quote two)
               end)))
 
-Name(expected Quote(two))
-Name(actual first(rest(data)))
+(Name expected (Quote two))
+(Name actual (first (rest data)))
 
-eq?(expected actual)
+(eq? expected actual)
 "
