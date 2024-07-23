@@ -13,7 +13,7 @@
 # Functions
 
 * `If` is our name for `cond`
-* `Name` is our name for `label`
+* `Let` is our name for `label`
 * `Quote`
 * `Fn` is our name for `lambda`
 

@@ -1,0 +1,4 @@
+Let(second(values)
+  first(rest(values)))
+
+print(second)

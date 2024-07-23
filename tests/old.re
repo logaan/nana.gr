@@ -1,17 +1,5 @@
-  evalAndPrint("(+ 1 1)");
-  evalAndPrint("(first (quote (1 2 3)))");
-  evalAndPrint("(println (quote foo))");
-  evalAndPrint("(def a 4)
-           (println a)");
 
-  evalAndPrint(
-    "
-             (def square
-               (lambda (n)
-                 (* n n)))
-             (println square)",
-  );
-  evalAndPrint("((lambda () (println 1)))");
+  evalAndPrint("");
 
   evalAndPrint("((lambda () ((lambda () (println 2)))))");
   evalAndPrint(

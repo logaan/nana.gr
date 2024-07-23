@@ -1,0 +1,77 @@
+Fn([foo bar] print(1))()
+
+((fn [foo bar] (println 1)))
+
+fn([foo bar] println(1))()
+
+Fn [foo bar]
+  println(1)
+()
+
+----------------------------------------
+https://readable.sourceforge.io
+
+Def do
+    Fn [a b]
+        b
+
+Def count-to-10
+  Fn [c]
+    do print(c)
+      if {c = 10} 
+        quote(worked)
+        count-to-10({c + 1})
+
+count-to-10(0)
+        
+----------------------------------------
+https://dwheeler.com/readable/alternative-s-expressions.html
+
+What if we went with a kind of stripped down Restricted ZY-expressions?
+I don't care so much about infix operators. I kind of like that there are no
+operators and everything is just functions handled uniformly.
+
+So what if a symbol directly preceding an opening paren gets moved inside it?
+
+`foo(1 2 3)` becomes `(foo 1 2 3)`
+
+but `foo (1 2 3)` is still `foo (1 2 3)`
+
+and `(1 2 3) is still valid`
+
+how would lambdas work? In clojure we have
+
+    (fn [values] (first (rest values)))
+    
+That could become 
+
+    Fn([values] first(rest(values)))
+
+Which... honestly just looks worse to me. I really don't like `Fn([`.
+
+----------------------------------------
+
+So what if brackets don't tag. Then you could tag things with them.
+
+    (fn [values] (first (rest values)))
+    
+That could become 
+
+    [values](first(rest(values)))
+
+Which I don't like. It's a special case where we don't need one. Fn should just be a macro.
+
+----------------------------------------
+
+In js we have
+    
+    function(values) { values.rest.first }
+
+But we can't use braces because they conflict with maps.
+
+    Fn[values]( first(rest(values)) )
+    Fn(values)[ first(rest(values)) ]
+
+    map(Fn(n)[ sum(n n) ] numbers)
+
+----------------------------------------
