@@ -13,14 +13,14 @@ let rec parsePart = (in: List<String>, out: List<Data>) =>
     (["(", ...restIn], out) => {
       match (parsePart(restIn, [])) {
         Ok((unparsed, parsed)) =>
-          parsePart(unparsed, Stdlist.append([List(parsed)], out)),
+          parsePart(unparsed, Stdlist.append(out, [List(parsed)])),
         Err(reason) => Err(reason),
       }
     },
-    ([")", ...restIn], out) => Ok((restIn, Stdlist.reverse(out))),
+    ([")", ...restIn], out) => Ok((restIn, out)),
     ([nextIn, ...restIn], out) =>
-      parsePart(restIn, Stdlist.append([Symbol(nextIn)], out)),
-    ([], out) => Ok(([], Stdlist.reverse(out))),
+      parsePart(restIn, Stdlist.append(out, [Symbol(nextIn)])),
+    ([], out) => Ok(([], out)),
   }: Result<(List<String>, List<Data>), String>
 
 provide let parse = tokens => match (parsePart(tokens, [])) {
