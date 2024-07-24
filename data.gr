@@ -1,0 +1,6 @@
+module Data
+
+provide enum rec Data {
+  Symbol(String),
+  List(List<Data>),
+}

@@ -1,11 +1,10 @@
 module Test
 
 from "./examples.gr" include Examples
-from "./tokenise.gr" include Tokenise
-from "./parser.gr" include Parser
-use Parser.{ type Data }
-
-let tokeniseAndParse = example => Parser.parse(Tokenise.tokenise(example))
+from "./read.gr" include Read
+from "./data.gr" include Data
+use Data.{ type Data }
+use Read.{ tokenise }
 
 let expectedCompare = Ok(
   [
@@ -81,24 +80,23 @@ let expectedAssignment = Ok(
 )
 
 provide let testParser = () => {
-  assert Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol)
-  assert Ok([Symbol("foo"), Symbol("bar")]) ==
-    tokeniseAndParse(Examples.twoSymbols)
+  assert Ok([Symbol("foo")]) == Read.read(Examples.symbol)
+  assert Ok([Symbol("foo"), Symbol("bar")]) == Read.read(Examples.twoSymbols)
   assert Ok([List([Symbol("Quote"), Symbol("foo")])]) ==
-    tokeniseAndParse(Examples.quote)
+    Read.read(Examples.quote)
   assert Ok([List([Symbol("Quote"), List([Symbol("Quote"), Symbol("foo")])])]) ==
-    tokeniseAndParse(Examples.nestedQuote)
-  assert expectedCompare == tokeniseAndParse(Examples.compare)
-  assert expectedAssignment == tokeniseAndParse(Examples.assignment)
+    Read.read(Examples.nestedQuote)
+  assert expectedCompare == Read.read(Examples.compare)
+  assert expectedAssignment == Read.read(Examples.assignment)
   true
 }
 
 provide let testTokeniser = () => {
-  assert Tokenise.tokenise(Examples.symbol) == ["foo"]
-  assert Tokenise.tokenise(Examples.quote) == ["(", "Quote", "foo", ")"]
-  assert Tokenise.tokenise(Examples.nestedQuote) ==
+  assert tokenise(Examples.symbol) == ["foo"]
+  assert tokenise(Examples.quote) == ["(", "Quote", "foo", ")"]
+  assert tokenise(Examples.nestedQuote) ==
     ["(", "Quote", "(", "Quote", "foo", ")", ")"]
-  assert Tokenise.tokenise(Examples.compare) ==
+  assert tokenise(Examples.compare) ==
     [
       "(",
       "eq?",
@@ -126,7 +124,7 @@ provide let testTokeniser = () => {
       ")",
       ")",
     ]
-  assert Tokenise.tokenise(Examples.assignment) ==
+  assert tokenise(Examples.assignment) ==
     [
       "(",
       "Name",

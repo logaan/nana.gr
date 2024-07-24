@@ -1,0 +1,18 @@
+module Evaluate
+
+from "./data.gr" include Data
+use Data.{ type Data }
+
+from "map" include Map
+
+provide let evaluate = (
+  expression: Data,
+  environment: Map.Immutable.Map<Data, Data>,
+) => match (expression) {
+  Symbol(_name) => match (Map.Immutable.get(expression, environment)) {
+    Some(value) => Ok(value),
+    None => Err("Symbol has not been defined"),
+  },
+  List([]) => Err("Tried to evaluate an empty list"),
+  List(_) => Ok(Symbol("Hello world")),
+}: Result<Data, String>
