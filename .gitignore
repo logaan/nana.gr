@@ -1,2 +1,3 @@
 /*.wasm
 /target
+node_modules/.lsp/debug.log

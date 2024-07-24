@@ -80,96 +80,100 @@ let expectedAssignment = Ok(
   ],
 )
 
-provide let testParser = () =>
-  Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol) &&
-    Ok([Symbol("foo"), Symbol("bar")]) == tokeniseAndParse(Examples.twoSymbols) &&
-    Ok([List([Symbol("Quote"), Symbol("foo")])]) ==
-      tokeniseAndParse(Examples.quote) &&
-    Ok([List([Symbol("Quote"), List([Symbol("Quote"), Symbol("foo")])])]) ==
-      tokeniseAndParse(Examples.nestedQuote) &&
-    expectedCompare == tokeniseAndParse(Examples.compare) &&
-    expectedAssignment == tokeniseAndParse(Examples.assignment)
+provide let testParser = () => {
+  assert Ok([Symbol("foo")]) == tokeniseAndParse(Examples.symbol)
+  assert Ok([Symbol("foo"), Symbol("bar")]) ==
+    tokeniseAndParse(Examples.twoSymbols)
+  assert Ok([List([Symbol("Quote"), Symbol("foo")])]) ==
+    tokeniseAndParse(Examples.quote)
+  assert Ok([List([Symbol("Quote"), List([Symbol("Quote"), Symbol("foo")])])]) ==
+    tokeniseAndParse(Examples.nestedQuote)
+  assert expectedCompare == tokeniseAndParse(Examples.compare)
+  assert expectedAssignment == tokeniseAndParse(Examples.assignment)
+  true
+}
 
-provide let testTokeniser = () =>
-  Tokenise.tokenise(Examples.symbol) == ["foo"] &&
-    Tokenise.tokenise(Examples.quote) == ["(", "Quote", "foo", ")"] &&
-    Tokenise.tokenise(Examples.nestedQuote) ==
-      ["(", "Quote", "(", "Quote", "foo", ")", ")"] &&
-    Tokenise.tokenise(Examples.compare) ==
-      [
-        "(",
-        "eq?",
-        "second",
-        "(",
-        "first",
-        "(",
-        "rest",
-        "(",
-        "pair",
-        "(",
-        "Quote",
-        "first",
-        ")",
-        "(",
-        "pair",
-        "(",
-        "Quote",
-        "second",
-        ")",
-        "end",
-        ")",
-        ")",
-        ")",
-        ")",
-        ")",
-      ] &&
-    Tokenise.tokenise(Examples.assignment) ==
-      [
-        "(",
-        "Name",
-        "data",
-        "(",
-        "pair",
-        "(",
-        "Quote",
-        "one",
-        ")",
-        "(",
-        "pair",
-        "(",
-        "Quote",
-        "two",
-        ")",
-        "end",
-        ")",
-        ")",
-        ")",
-        "(",
-        "Name",
-        "expected",
-        "(",
-        "Quote",
-        "two",
-        ")",
-        ")",
-        "(",
-        "Name",
-        "actual",
-        "(",
-        "first",
-        "(",
-        "rest",
-        "data",
-        ")",
-        ")",
-        ")",
-        "(",
-        "eq?",
-        "expected",
-        "actual",
-        ")",
-      ]
-
+provide let testTokeniser = () => {
+  assert Tokenise.tokenise(Examples.symbol) == ["foo"]
+  assert Tokenise.tokenise(Examples.quote) == ["(", "Quote", "foo", ")"]
+  assert Tokenise.tokenise(Examples.nestedQuote) ==
+    ["(", "Quote", "(", "Quote", "foo", ")", ")"]
+  assert Tokenise.tokenise(Examples.compare) ==
+    [
+      "(",
+      "eq?",
+      "second",
+      "(",
+      "first",
+      "(",
+      "rest",
+      "(",
+      "pair",
+      "(",
+      "Quote",
+      "first",
+      ")",
+      "(",
+      "pair",
+      "(",
+      "Quote",
+      "second",
+      ")",
+      "end",
+      ")",
+      ")",
+      ")",
+      ")",
+      ")",
+    ]
+  assert Tokenise.tokenise(Examples.assignment) ==
+    [
+      "(",
+      "Name",
+      "data",
+      "(",
+      "pair",
+      "(",
+      "Quote",
+      "one",
+      ")",
+      "(",
+      "pair",
+      "(",
+      "Quote",
+      "two",
+      ")",
+      "end",
+      ")",
+      ")",
+      ")",
+      "(",
+      "Name",
+      "expected",
+      "(",
+      "Quote",
+      "two",
+      ")",
+      ")",
+      "(",
+      "Name",
+      "actual",
+      "(",
+      "first",
+      "(",
+      "rest",
+      "data",
+      ")",
+      ")",
+      ")",
+      "(",
+      "eq?",
+      "expected",
+      "actual",
+      ")",
+    ]
+  true
+}
 if (testTokeniser() && testParser())
   print("Tests passed")
 else
