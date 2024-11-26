@@ -13,6 +13,7 @@ provide let evaluate = (
     Some(value) => Ok(value),
     None => Err("Symbol has not been defined"),
   },
+  List([Symbol("Quote"), data]) => Ok(data),
   List([]) => Err("Tried to evaluate an empty list"),
   List(_) => Ok(Symbol("Hello world")),
 }: Result<Data, String>
